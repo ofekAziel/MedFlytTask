@@ -63,7 +63,7 @@ const TableView = (props: Props) => {
                             <Td>{caregiver.name}</Td>
                             <Td>
                                 {caregiver.patients.length > 0 ? (
-                                    caregiver.patients
+                                    caregiver.patients.map((patient, i) => (i != caregiver.patients.length - 1 ? patient + ", " : patient))
                                 ) : (
                                     <None />
                                 )}
