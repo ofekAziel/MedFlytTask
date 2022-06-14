@@ -20,7 +20,7 @@ export const getReport = async (req: Request, res: Response) => {
             patient.name      AS patient_name,
             visit.date        AS visit_date
         FROM caregiver
-        JOIN visit ON visit.caregiver = caregiver.id
+        JOIN visit ON visit.caregiver = caregiver.id AND extract(year from VISIT.date) = ${req.params.year}
         JOIN patient ON patient.id = visit.patient
     `;
     
