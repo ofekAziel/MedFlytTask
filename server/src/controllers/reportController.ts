@@ -20,7 +20,7 @@ export const getReport = async (req: Request, res: Response) => {
             patient.name      AS patient_name,
             visit.date        AS visit_date
         FROM caregiver
-        JOIN visit ON visit.caregiver = caregiver.id
+        JOIN visit ON visit.caregiver = caregiver.id AND extract(year from VISIT.date) = ${req.params.year}
         JOIN patient ON patient.id = visit.patient
     `;
     
@@ -32,12 +32,20 @@ export const getReport = async (req: Request, res: Response) => {
             caregivers: []
         };
 
+        let caregiverPatientsMap = new Map<string, string[]>();
+
         for ( let row of result.rows) {
-            report.caregivers.push({
-                name: row.caregiver_name,
-                patients: [row.patient_name]
-            })
+            if (!caregiverPatientsMap.has(row.caregiver_name)) {
+                caregiverPatientsMap.set(row.caregiver_name, [row.patient_name]);
+            } else {
+                caregiverPatientsMap.get(row.caregiver_name)?.push(row.patient_name);
+            } 
         }
+
+        caregiverPatientsMap.forEach((value: string[], key: string) => {
+            report.caregivers.push({name: key, patients: value});
+        });
+
         res.status(200).json(report);
     } catch (error) {
         throw new Error(error.message);
